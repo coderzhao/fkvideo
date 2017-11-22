@@ -23,7 +23,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
 
-import cn.anytec.util.FkvideoRunnable;
+import com.ssmdemo.util.FkvideoRunnable;
 
 public class FkvideoUtil {
 	private static ServletContext application;
