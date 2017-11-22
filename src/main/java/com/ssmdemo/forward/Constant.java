@@ -9,9 +9,7 @@ public class Constant {
 	public static final String TOKEN = sdk.getParameter("TOKEN");
 	public static final String SDK_IP = sdk.getParameter("SDK_IP");
 	
-	public static final String HOST = sdk.getParameter("HOST");
-	public static final String USERNAME = sdk.getParameter("USERNAME");
-	public static final String PASSWORD = sdk.getParameter("PASSWORD");
+
 	//截取人脸的post地址及API
 	public static final String API_HOST = sdk.getParameter("API_HOST");
 	public static final String API_TOKEN = sdk.getParameter("API_TOKEN");

@@ -16,10 +16,7 @@ public class TestFkvideo {
 		thread.start();
 		thread.join();
 		System.out.println("end");*/
-		ShellConnRemote shellConnRemote = new ShellConnRemote();
-		shellConnRemote.getSession();
-		System.out.println(shellConnRemote.exeCommand("fkvideo_detector --api-host 192.168.10.124 --api-token test --api-port 8080 --license-ntls-server 192.168.10.208:3133 -S file@:/home/video/111.flv --camid 1510292008311 --single-pass --body galleries=test --request-url /fkvideo/anytec/v0/identify"));
-		shellConnRemote.close();
+
 	}
 	
 }
