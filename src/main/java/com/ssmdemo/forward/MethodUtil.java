@@ -7,7 +7,9 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -136,7 +138,7 @@ public class MethodUtil {
 		file.put("photo1",img);
 		file.put("photo2",file.get("photo"));
 		if(file.containsKey("face0"))
-			pic = "data:image;base64,"+ Base64Encrypt.byteArrayToString((byte[])file.get("face0"));//face0(人脸切图)或photo(全图)
+			pic = "data:image;base64,"+Base64Encrypt.byteArrayToString((byte[])file.get("face0"));//face0(人脸切图)或photo(全图)
 		if(param.containsKey("cam_id")) {
 			request.setAttribute("camid",param.get("cam_id"));
 		}
@@ -176,16 +178,18 @@ public class MethodUtil {
 		}
 		response.setHeader("Cache-control", "no-cache");
 		//过滤threshold低于传入阈值的verify响应
-		boolean gthreshold = true;
-		/*try {
+		try {
 			JSONObject jsonObject = (JSONObject) jsonParser.parse(SDKreply);
-			JSONArray results = (JSONArray) jsonObject.get("results");
-			results.
+			boolean verified = (boolean)jsonObject.get("verified");
+			if(verified==false){
+				logger.info("人脸匹配度不达标");
+				return null;
+			}
+
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		if(gthreshold==false)
-			return null;*/
+
 		//全局变量，用于servlet间数据交互
 		logger.info("fkvideo响应数据处理");
 		ServletContext application = request.getSession().getServletContext();
@@ -200,6 +204,7 @@ public class MethodUtil {
 		String reply = SDKreply.replaceFirst("\"results\"",add);
 		logger.info("JSON: "+reply);
 		list.add(reply);
+		logger.info("添加匹配人脸");
 		logger.info("list长度： "+list.size());
 		application.setAttribute(camid,list);
 		return null;

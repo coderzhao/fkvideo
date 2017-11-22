@@ -1,6 +1,19 @@
 package com.ssmdemo.forward;
 
-import com.ssmdemo.util.FkvideoRunnable;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.ssmdemo.util.RuntimeLocal;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -9,13 +22,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
+
+import com.ssmdemo.util.FkvideoRunnable;
 
 public class FkvideoUtil {
 	private static ServletContext application;
@@ -98,13 +106,10 @@ public class FkvideoUtil {
 			param.put(name, request.getParameter(name));
 			logger.info("PARAM:" + name + "--" + "" + param.get(name));
 		}
-		//转发和设定报头信息
-		header.put("Method",request.getMethod());
-		header.put("API", API);
-		logger.info(request.getAttribute("API").toString());
+		//配置命令参数并启动fkvideo组件
 		String camid = ((Long)System.currentTimeMillis()).toString();
 		HttpSession session = request.getSession();
-		session.setMaxInactiveInterval(180);
+		session.setMaxInactiveInterval(300);
 		StringBuilder cmdBuilder = new StringBuilder("fkvideo_detector --api-host ");
 		cmdBuilder.append(Constant.API_HOST)
 		.append(" --api-token ").append(Constant.API_TOKEN)
@@ -112,14 +117,26 @@ public class FkvideoUtil {
 		.append(" --license-ntls-server ").append(Constant.LICENSE_NTLS_SERVER)
 		.append(" -S file@:").append(Constant.VIDEO_PATH).append((String)param.get("videoName"))
 		.append(" --camid ").append(camid)
+		//fkvideo参数设置
 		.append(" --single-pass")
+
+		//====================
+		.append(" --post-uniq 1")
+		.append(" --uc-max-time-diff 1")
+		.append(" --uc-max-dup 4")
+		.append(" --uc-max-avg-shift 10")
+		//====================
 		.append(" --scale ").append(Constant.SCALE)
+		.append(" --min-face-size 50")
+		.append(" --disable-drops 1")
+		.append(" --min-score -7")
+		.append(" --max-persons 4")
+		.append(" --draw-track 0")
 		.append(" --tracker-threads ").append(Constant.TRACKER_THREADS)
-		.append(" --body galleries=").append((String)param.get("galleries"))
 		.append(" --body threshold=").append((String)param.get("threshold"))
 		.append(" --body mf_selector=all")
 		.append(" --sink-url rtmp://localhost:1935/livecam")
-		.append(" --request-url ").append(Constant.REQUEST_URI).append(request.getAttribute("API"));
+		.append(" --request-url ").append(Constant.REQUEST_URI);
 		String cmd = cmdBuilder.toString();
 		cmd = cmd.replaceAll("\n","");
 		cmd = cmd.replaceAll("\r","");
