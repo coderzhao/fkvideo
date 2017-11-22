@@ -1,0 +1,5 @@
+# Project ignore files
+/target
+/src/test/java/*
+.idea
+*.iml
